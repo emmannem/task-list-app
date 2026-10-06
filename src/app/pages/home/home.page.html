@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title class="ion-text-center"> Mis Tareas </ion-title>
+    <ion-title class="ion-text-center ion-title-bold"> Mis Tareas </ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -14,6 +14,7 @@ Imagenes, Inputs, Botones o Formularios-->
       type="text"
       placeholder="Nueva Tarea"
       name="task"
+      /* Tow-Way Binding (Enlace Bidirecional) */
       [(ngModel)]="task"
     />
     <ion-button (click)="addTask()" [disabled]="!task">

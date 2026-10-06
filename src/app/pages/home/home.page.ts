@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 // Importación de Angular
 import { FormsModule } from '@angular/forms';
 import {
@@ -15,6 +15,9 @@ import {
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { addOutline } from 'ionicons/icons';
+
+// Importación del servicio Alert que hemos creado en src/app/services/alert.ts
+import { Alert } from '../../services/alert';
 
 @Component({
   selector: 'app-home',
@@ -35,6 +38,10 @@ import { addOutline } from 'ionicons/icons';
   ],
 })
 export class HomePage {
+
+  // Injectamos el servicio Alert en HomePage para poder utilizarlo en esta página.
+  private alertService: Alert = inject(Alert);
+
   public tasks: string[] = [
     'Comprar Leche',
     'Dormir',
@@ -56,13 +63,25 @@ export class HomePage {
       this.tasks.push(this.task);
       console.log(this.tasks);
       this.task = '';
+      this.alertService.alertMessage(
+        'Exito',
+        'La tarea se ha agregado correctamente'
+      );
     } else {
       console.log('La tarea ya existe');
+        this.alertService.alertMessage(
+        'Error',
+        'La tarea ya existe'
+      );
     }
   }
 
   private ifExistTask(task: string) {
+    // Utilizamos el método find() para buscar si la tarea ya existe en el array tasks.
     return this.tasks.find(
+      // Comparamos la tarea que queremos agregar con las tareas existentes en el array tasks.
+      // toUpperCase() convierte la cadena a mayúsculas para que la comparación no sea sensible a mayúsculas y minúsculas.
+      // y trim() elimina los espacios en blanco al inicio y al final de la cadena para que la comparación no sea sensible a espacios.
       (item: string) => task.toUpperCase().trim() === item.toUpperCase().trim(),
     );
   }
