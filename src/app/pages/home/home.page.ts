@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 // Importación de Angular
 import { FormsModule } from '@angular/forms';
 import {
@@ -12,9 +12,12 @@ import {
   IonIcon,
   IonLabel,
   IonList,
+  IonItemSliding,
+  IonItemOptions,
+  IonItemOption,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { addOutline } from 'ionicons/icons';
+import { addOutline, trashOutline } from 'ionicons/icons';
 
 // Importación del servicio Alert que hemos creado en src/app/services/alert.ts
 import { Alert } from '../../services/alert';
@@ -24,6 +27,9 @@ import { Alert } from '../../services/alert';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   imports: [
+    IonItemOption,
+    IonItemOptions,
+    IonItemSliding,
     IonLabel,
     IonHeader,
     IonToolbar,
@@ -38,9 +44,10 @@ import { Alert } from '../../services/alert';
   ],
 })
 export class HomePage {
-
   // Injectamos el servicio Alert en HomePage para poder utilizarlo en esta página.
   private alertService: Alert = inject(Alert);
+
+  private cdr = inject(ChangeDetectorRef);
 
   public tasks: string[] = [
     'Comprar Leche',
@@ -54,6 +61,7 @@ export class HomePage {
   constructor() {
     addIcons({
       addOutline,
+      trashOutline,
     });
   }
 
@@ -65,14 +73,11 @@ export class HomePage {
       this.task = '';
       this.alertService.alertMessage(
         'Exito',
-        'La tarea se ha agregado correctamente'
+        'La tarea se ha agregado correctamente',
       );
     } else {
       console.log('La tarea ya existe');
-        this.alertService.alertMessage(
-        'Error',
-        'La tarea ya existe'
-      );
+      this.alertService.alertMessage('Error', 'La tarea ya existe');
     }
   }
 
@@ -84,5 +89,31 @@ export class HomePage {
       // y trim() elimina los espacios en blanco al inicio y al final de la cadena para que la comparación no sea sensible a espacios.
       (item: string) => task.toUpperCase().trim() === item.toUpperCase().trim(),
     );
+  }
+
+  confirmDeleteTask(task: string) {
+    this.alertService.alertConfirm(
+      'Confirmar',
+      '¿Estás seguro de que deseas eliminar esta tarea?',
+      () => this.deleteTask(task),
+    );
+  }
+
+  private deleteTask(task: string) {
+    console.log('Eliminando tarea:', task);
+
+    // findIndex(): Busca el valor que queremos eliminar y devuelve el indice
+    const index = this.tasks.findIndex(
+      (item: string) => task.toUpperCase().trim() === item.toUpperCase().trim(),
+    );
+
+    // Revisamos si el el indice devuelto es valido (cosa que no es tan necesaria)
+    if (index != -1) {
+      // splice(index): Elimina a partir del indice que se le esta proporcionando
+      // (index, 1) : se le especifica cuantos elementos eliminar apartir del indice
+      // en este caso se le indica 1 que es el indice.
+      this.tasks.splice(index, 1);
+      this.cdr.markForCheck();
+    }
   }
 }

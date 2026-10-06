@@ -26,16 +26,29 @@ Imagenes, Inputs, Botones o Formularios-->
     <ion-label>No Hay Tareas Pendientes</ion-label>
   </ion-item>
   } @else {
+    <!-- ion-list: Contenedor de elementos de lista -->
   <ion-list>
     <!-- track task: Le indica a Angular cómo identificar 
-     cada elemento para poder actualizar el DOM de forma 
+     cada elemento para poder actualizar el DOM (Document Object Model) de forma 
      eficiente. Si agregas o quitas una tarea, Angular 
      sabe cuáles filas ya existían y solo crea o elimina 
      las necesarias, en lugar de redibujar toda la lista -->
+
+     <!-- 
+     task of tasks: Recorre el arreglo de tareas y por cada
+     elemento crea un ion-item con el nombre de la tarea 
+     -->
     @for (task of tasks; track task) {
+      <ion-item-sliding>
     <ion-item>
       <ion-label> {{task}} </ion-label>
     </ion-item>
+    <ion-item-options side="end">
+      <ion-item-option color="danger" (click)="confirmDeleteTask(task)">
+        <ion-icon slot="icon-only" name="trash-outline"/>
+      </ion-item-option>
+    </ion-item-options>
+    </ion-item-sliding>
     }
   </ion-list>
   }
