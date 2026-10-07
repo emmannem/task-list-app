@@ -15,6 +15,9 @@ import {
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
+  IonReorderGroup,
+  IonReorder,
+  ItemReorderEventDetail,
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import { addOutline, trashOutline } from 'ionicons/icons';
@@ -22,11 +25,15 @@ import { addOutline, trashOutline } from 'ionicons/icons';
 // Importación del servicio Alert que hemos creado en src/app/services/alert.ts
 import { Alert } from '../../services/alert';
 
+import { Preferences } from '@capacitor/preferences';
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   imports: [
+    IonReorder,
+    IonReorderGroup,
     IonItemOption,
     IonItemOptions,
     IonItemSliding,
@@ -49,6 +56,8 @@ export class HomePage {
 
   private cdr = inject(ChangeDetectorRef);
 
+  private readonly KEY_TASK = 'ddr_key_task';
+
   public tasks: string[] = [
     'Comprar Leche',
     'Dormir',
@@ -65,12 +74,32 @@ export class HomePage {
     });
   }
 
+  async ionViewWillEnter() {
+    const taskPreferences = await Preferences.get({ key: this.KEY_TASK });
+
+    if (taskPreferences.value) {
+      const tasks = JSON.parse(taskPreferences.value);
+      if (Array.isArray(tasks)) {
+        this.tasks = tasks;
+        this.cdr.markForCheck();
+      }
+    }
+  }
+
+  saveTasks() {
+    Preferences.set({
+      key: this.KEY_TASK,
+      value: JSON.stringify(this.tasks),
+    });
+  }
+
   addTask() {
     console.log(this.task);
     if (!this.ifExistTask(this.task)) {
       this.tasks.push(this.task);
       console.log(this.tasks);
       this.task = '';
+      this.saveTasks();
       this.alertService.alertMessage(
         'Exito',
         'La tarea se ha agregado correctamente',
@@ -113,7 +142,17 @@ export class HomePage {
       // (index, 1) : se le especifica cuantos elementos eliminar apartir del indice
       // en este caso se le indica 1 que es el indice.
       this.tasks.splice(index, 1);
+      this.saveTasks();
       this.cdr.markForCheck();
     }
+  }
+
+  orderTasks(event: CustomEvent<ItemReorderEventDetail>) {
+    console.log(event);
+
+    console.log('Antes de Ordenar: ', this.tasks);
+    this.tasks = event.detail.complete(this.tasks);
+    console.log('Despues de Ordenar: ', this.tasks);
+    this.saveTasks();
   }
 }

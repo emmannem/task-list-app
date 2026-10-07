@@ -38,10 +38,13 @@ Imagenes, Inputs, Botones o Formularios-->
      task of tasks: Recorre el arreglo de tareas y por cada
      elemento crea un ion-item con el nombre de la tarea 
      -->
+
+     <ion-reorder-group [disabled] = "false" (ionItemReorder) = "orderTasks($any($event))">
     @for (task of tasks; track task) {
       <ion-item-sliding>
     <ion-item>
       <ion-label> {{task}} </ion-label>
+      <ion-reorder/>
     </ion-item>
     <ion-item-options side="end">
       <ion-item-option color="danger" (click)="confirmDeleteTask(task)">
@@ -50,6 +53,7 @@ Imagenes, Inputs, Botones o Formularios-->
     </ion-item-options>
     </ion-item-sliding>
     }
+    </ion-reorder-group>
   </ion-list>
   }
 </ion-content>
